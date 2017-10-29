@@ -1,0 +1,42 @@
+
+<p>Welcome, {{current_user.name}}!</p>
+<a [routerLink]="['/create']">Create a New Poll</a>
+<a href='' (click)="LogOut()">Logout</a>
+
+
+
+
+<h2>Current Polls</h2>
+
+<form (submit)="onSearch()" #formData='ngForm'>
+    <label for="query">Search</label>
+    <input type="text" name="query"
+    required
+    [(ngModel)]="search.query"
+    #query="ngModel">
+    <input type="submit" value="search" [disabled]="formData.invalid">
+</form>
+<h3 *ngIf="questions.length == 0">No Search Results!</h3>
+<table *ngIf="questions.length > 0">
+  <tr>
+    <th>Name</th>
+    <th>Survey Question</th>
+    <th>Date Posted</th>
+    <th>Action</th>
+  </tr>
+  <tr *ngFor="let question of questions">
+      <td>{{question.user.name}}</td>
+    <td>
+      <a [routerLink]="['/vote', question._id]">
+      {{question.qtext}}
+      </a>
+    </td>
+    <td>{{question.createdAt | date}}</td>
+    <td *ngIf="question.user._id === current_user._id">
+      <a href='' (click)="Delete(question._id)">Delete</a>
+    </td>
+  </tr>
+
+</table>
+
+<button (click)="resetSearch()">Reset Search</button>
