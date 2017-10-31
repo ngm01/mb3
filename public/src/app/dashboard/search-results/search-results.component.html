@@ -1,0 +1,20 @@
+<table *ngIf="results.length > 0">
+  <tr>
+    <th>Name</th>
+    <th>Survey Question</th>
+    <th>Date Posted</th>
+    <th>Action</th>
+  </tr>
+  <tr *ngFor="let question of resultify(query)">
+    <td>{{question.user.name}}</td>
+    <td>
+      <a [routerLink]="['/vote', question._id]">
+      {{question.qtext}}
+      </a>
+    </td>
+    <td>{{question.createdAt | date}}</td>
+    <td *ngIf="question.user._id === current_user._id">
+      <a href='' (click)="Delete(question._id)">Delete</a>
+    </td>
+  </tr>
+</table>

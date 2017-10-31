@@ -12,6 +12,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { UserService } from './user.service';
 import { QuestionService } from './question.service';
+import { SearchResultsComponent } from './dashboard/search-results/search-results.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { QuestionService } from './question.service';
     VoteComponent,
     CreateComponent,
     DashboardComponent,
+    SearchResultsComponent,
   ],
   imports: [
     BrowserModule,

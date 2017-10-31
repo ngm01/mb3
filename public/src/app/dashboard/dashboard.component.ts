@@ -11,12 +11,13 @@ export class DashboardComponent implements OnInit {
 
   current_user;
   questions= [];
-  search = {query: "", results: []};
+  search = {query: ""};
+
+
 
   constructor(private _userservice: UserService, private _router: Router, private _questionservice: QuestionService) { }
 
   ngOnInit() {
-    this.search = {query: "", results: []};
     this._userservice.getCurrentUser().subscribe(
      res =>{
        if (res){
@@ -24,8 +25,7 @@ export class DashboardComponent implements OnInit {
        }
      }
     );
-
-    this.resetSearch();
+  
   }
 
   LogOut(){
@@ -36,33 +36,4 @@ export class DashboardComponent implements OnInit {
     this._router.navigateByUrl('create')
   }
 
-  Delete(id){
-    this._questionservice.DeleteQuestion(id);
-    this._router.navigateByUrl('/')
-  }
-
-  onSearch(){
-    this.search.results = [];
-    this._questionservice.Search(this.search).subscribe(
-    (res)=>{
-      this.search.results = this.search.results.concat(res.json().results);
-      for(let i=0; i<this.search.results.length; i++){
-        for(let k=i+1;k<this.search.results.length; k++){
-          if(this.search.results[i] === this.search.results[k]){
-            this.search.results.splice(k--, 1);
-          }
-        }
-      }
-      this.questions = this.search.results;
-    })
-  }
-
-  resetSearch(){
-    this._questionservice.ShowAllQuestions().subscribe(
-      res =>{
-        this.questions = res.questions;
-        this.search = {query: "", results: []};
-      }
-    )
-  }
 }

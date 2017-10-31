@@ -150,12 +150,14 @@ var _a, _b;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__dashboard_dashboard_component__ = __webpack_require__("../../../../../src/app/dashboard/dashboard.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__user_service__ = __webpack_require__("../../../../../src/app/user.service.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__question_service__ = __webpack_require__("../../../../../src/app/question.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__dashboard_search_results_search_results_component__ = __webpack_require__("../../../../../src/app/dashboard/search-results/search-results.component.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
 
 
 
@@ -181,6 +183,7 @@ AppModule = __decorate([
             __WEBPACK_IMPORTED_MODULE_7__vote_vote_component__["a" /* VoteComponent */],
             __WEBPACK_IMPORTED_MODULE_8__create_create_component__["a" /* CreateComponent */],
             __WEBPACK_IMPORTED_MODULE_9__dashboard_dashboard_component__["a" /* DashboardComponent */],
+            __WEBPACK_IMPORTED_MODULE_12__dashboard_search_results_search_results_component__["a" /* SearchResultsComponent */],
         ],
         imports: [
             __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
@@ -250,7 +253,7 @@ var CreateComponent = (function () {
         this._questionservice = _questionservice;
         this._userservice = _userservice;
         this._router = _router;
-        this.question = { qtext: "", options: [["", 1], ["", 1], ["", 1], ["", 1]], user: "" };
+        this.question = { qtext: "", options: [["", 0], ["", 0], ["", 0], ["", 0]], user: "" };
     }
     CreateComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -295,7 +298,7 @@ exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-b
 
 
 // module
-exports.push([module.i, "table{\r\n    border-collapse: collapse;\r\n}\r\n\r\ntd, th {\r\n    border: 1px solid #dddddd;\r\n    text-align: left;\r\n    padding: 8px;\r\n}", ""]);
+exports.push([module.i, "", ""]);
 
 // exports
 
@@ -308,7 +311,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/dashboard/dashboard.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "\n<p>Welcome, {{current_user.name}}!</p>\n<a [routerLink]=\"['/create']\">Create a New Poll</a>\n<a href='' (click)=\"LogOut()\">Logout</a>\n\n\n\n\n<h2>Current Polls</h2>\n\n<form (submit)=\"onSearch()\" #formData='ngForm'>\n    <label for=\"query\">Search</label>\n    <input type=\"text\" name=\"query\"\n    required\n    [(ngModel)]=\"search.query\"\n    #query=\"ngModel\">\n    <input type=\"submit\" value=\"search\" [disabled]=\"formData.invalid\">\n</form>\n<h3 *ngIf=\"questions.length == 0\">No Search Results!</h3>\n<table *ngIf=\"questions.length > 0\">\n  <tr>\n    <th>Name</th>\n    <th>Survey Question</th>\n    <th>Date Posted</th>\n    <th>Action</th>\n  </tr>\n  <tr *ngFor=\"let question of questions\">\n      <td>{{question.user.name}}</td>\n    <td>\n      <a [routerLink]=\"['/vote', question._id]\">\n      {{question.qtext}}\n      </a>\n    </td>\n    <td>{{question.createdAt | date}}</td>\n    <td *ngIf=\"question.user._id === current_user._id\">\n      <a href='' (click)=\"Delete(question._id)\">Delete</a>\n    </td>\n  </tr>\n\n</table>\n\n<button (click)=\"resetSearch()\">Reset Search</button>\n"
+module.exports = "\n<p>Welcome, {{current_user.name}}!</p>\n<a [routerLink]=\"['/create']\">Create a New Poll</a>\n<a href='' (click)=\"LogOut()\">Logout</a>\n\n\n\n\n<h2>Current Polls</h2>\n\n<form  #formData='ngForm'>\n    <label for=\"query\">Search</label>\n    <input type=\"text\" name=\"query\"\n    required\n    [(ngModel)]=\"search.query\"\n    #query=\"ngModel\">\n</form>\n\n<app-search-results [query]=\"search.query\" [current_user]=\"current_user\"></app-search-results>"
 
 /***/ }),
 
@@ -340,17 +343,15 @@ var DashboardComponent = (function () {
         this._router = _router;
         this._questionservice = _questionservice;
         this.questions = [];
-        this.search = { query: "", results: [] };
+        this.search = { query: "" };
     }
     DashboardComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.search = { query: "", results: [] };
         this._userservice.getCurrentUser().subscribe(function (res) {
             if (res) {
                 _this.current_user = res;
             }
         });
-        this.resetSearch();
     };
     DashboardComponent.prototype.LogOut = function () {
         this._userservice.LogOut();
@@ -361,28 +362,6 @@ var DashboardComponent = (function () {
     DashboardComponent.prototype.Delete = function (id) {
         this._questionservice.DeleteQuestion(id);
         this._router.navigateByUrl('/');
-    };
-    DashboardComponent.prototype.onSearch = function () {
-        var _this = this;
-        this.search.results = [];
-        this._questionservice.Search(this.search).subscribe(function (res) {
-            _this.search.results = _this.search.results.concat(res.json().results);
-            for (var i = 0; i < _this.search.results.length; i++) {
-                for (var k = i + 1; k < _this.search.results.length; k++) {
-                    if (_this.search.results[i] === _this.search.results[k]) {
-                        _this.search.results.splice(k--, 1);
-                    }
-                }
-            }
-            _this.questions = _this.search.results;
-        });
-    };
-    DashboardComponent.prototype.resetSearch = function () {
-        var _this = this;
-        this._questionservice.ShowAllQuestions().subscribe(function (res) {
-            _this.questions = res.questions;
-            _this.search = { query: "", results: [] };
-        });
     };
     return DashboardComponent;
 }());
@@ -397,6 +376,103 @@ DashboardComponent = __decorate([
 
 var _a, _b, _c;
 //# sourceMappingURL=dashboard.component.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/dashboard/search-results/search-results.component.css":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "table{\r\n    border-collapse: collapse;\r\n}\r\n\r\ntd, th {\r\n    border: 1px solid #dddddd;\r\n    text-align: left;\r\n    padding: 8px;\r\n}", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/dashboard/search-results/search-results.component.html":
+/***/ (function(module, exports) {
+
+module.exports = "<table *ngIf=\"results.length > 0\">\n  <tr>\n    <th>Name</th>\n    <th>Survey Question</th>\n    <th>Date Posted</th>\n    <th>Action</th>\n  </tr>\n  <tr *ngFor=\"let question of resultify(query)\">\n    <td>{{question.user.name}}</td>\n    <td>\n      <a [routerLink]=\"['/vote', question._id]\">\n      {{question.qtext}}\n      </a>\n    </td>\n    <td>{{question.createdAt | date}}</td>\n    <td *ngIf=\"question.user._id === current_user._id\">\n      <a href='' (click)=\"Delete(question._id)\">Delete</a>\n    </td>\n  </tr>\n</table>"
+
+/***/ }),
+
+/***/ "../../../../../src/app/dashboard/search-results/search-results.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SearchResultsComponent; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__question_service__ = __webpack_require__("../../../../../src/app/question.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var SearchResultsComponent = (function () {
+    function SearchResultsComponent(_questionservice, _router) {
+        this._questionservice = _questionservice;
+        this._router = _router;
+        this.results = [];
+    }
+    SearchResultsComponent.prototype.ngOnInit = function () {
+        this.showAll();
+    };
+    SearchResultsComponent.prototype.resultify = function (q) {
+        var searchResults = [];
+        for (var i = 0; i < this.results.length; i++) {
+            if (this.results[i].qtext.toLowerCase().includes(q.toLowerCase())) {
+                searchResults.push(this.results[i]);
+            }
+        }
+        return searchResults;
+    };
+    SearchResultsComponent.prototype.showAll = function () {
+        var _this = this;
+        this._questionservice.ShowAllQuestions().subscribe(function (res) {
+            _this.results = res.questions;
+        });
+    };
+    SearchResultsComponent.prototype.Delete = function (id) {
+        this._questionservice.DeleteQuestion(id);
+        this._router.navigateByUrl('/');
+    };
+    return SearchResultsComponent;
+}());
+__decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["F" /* Input */])(),
+    __metadata("design:type", Object)
+], SearchResultsComponent.prototype, "query", void 0);
+__decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["F" /* Input */])(),
+    __metadata("design:type", Object)
+], SearchResultsComponent.prototype, "current_user", void 0);
+SearchResultsComponent = __decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["o" /* Component */])({
+        selector: 'app-search-results',
+        template: __webpack_require__("../../../../../src/app/dashboard/search-results/search-results.component.html"),
+        styles: [__webpack_require__("../../../../../src/app/dashboard/search-results/search-results.component.css")]
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__question_service__["a" /* QuestionService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__question_service__["a" /* QuestionService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* Router */]) === "function" && _b || Object])
+], SearchResultsComponent);
+
+var _a, _b;
+//# sourceMappingURL=search-results.component.js.map
 
 /***/ }),
 

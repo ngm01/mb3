@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class CreateComponent implements OnInit {
   current_user;
-  question = {qtext: "", options: [["", 1], ["", 1], ["", 1], ["", 1]], user: ""}
+  question = {qtext: "", options: [["", 0], ["", 0], ["", 0], ["", 0]], user: ""}
   constructor(private _questionservice: QuestionService, private _userservice: UserService, private _router: Router) { }
 
   ngOnInit() {
